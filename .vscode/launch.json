@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "AI.Workspace",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev:turbopack",
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": false,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
