@@ -23,10 +23,12 @@ export async function POST(request: Request) {
     },
     messages: await convertToModelMessages(messages),
   });
+  /* debugger (consumes stream)
   for await (const part of result.fullStream) {
     if (part.type === 'text-delta') {
       process.stdout.write(JSON.stringify(part) + '\n');
     }
   }
+  */
   return result.toUIMessageStreamResponse();
 }
