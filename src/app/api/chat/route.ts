@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const json = await request.json();
   const { messages } = requestSchema.parse(json);
   const openai = createOpenAI({
-    baseURL: process.env.OPENAI_BASE_URL
+    baseURL: process.env.OPENAI_API_BASE
   });
   const model = openai.responses(process.env.OPENAI_MODEL || "gpt-5.4");
   const result = streamText({
@@ -28,7 +28,6 @@ export async function POST(request: Request) {
     if (part.type === 'text-delta') {
       process.stdout.write(JSON.stringify(part) + '\n');
     }
-  }
-  */
+  } */
   return result.toUIMessageStreamResponse();
 }
