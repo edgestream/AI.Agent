@@ -23,10 +23,5 @@ export async function POST(request: Request) {
     },
     messages: await convertToModelMessages(messages),
   });
-  /* debugging (will consume the stream, so only use for testing)
-  for await (const part of result.fullStream) {
-    process.stdout.write(JSON.stringify(part) + '\n');
-  }
-  */
   return result.toUIMessageStreamResponse();
 }
