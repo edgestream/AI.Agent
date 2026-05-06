@@ -1,5 +1,3 @@
-# AI.Workspace
-
 Agentic workspace based on Next.js, TypeScript, Tailwind CSS, and shadcn/ui.
 
 ## Overview
