@@ -17,6 +17,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in the browser.
 
+## AI SDK DevTools
+
+For local development, the project is wired to Vercel AI SDK DevTools. That lets you inspect local AI requests and responses while using the chat UI. Start the DevTools:
+
+```bash
+npx @ai-sdk/devtools
+```
+
 ## Build
 
 Create a production build:

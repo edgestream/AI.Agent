@@ -1,5 +1,6 @@
-import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import { convertToModelMessages, streamText, type UIMessage, wrapLanguageModel } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
+import { devToolsMiddleware } from '@ai-sdk/devtools';
 import { z } from "zod";
 
 const requestSchema = z.object({
@@ -9,10 +10,9 @@ const requestSchema = z.object({
 export async function POST(request: Request) {
   const json = await request.json();
   const { messages } = requestSchema.parse(json);
-  const openai = createOpenAI({
-    baseURL: process.env.OPENAI_API_BASE
-  });
-  const model = openai.responses(process.env.OPENAI_MODEL || "gpt-5.4");
+  const openai = createOpenAI({ baseURL: process.env.OPENAI_API_BASE });
+  const openai_model = openai.responses(process.env.OPENAI_MODEL || "gpt-5.4");
+  const model = wrapLanguageModel({ model: openai_model, middleware: devToolsMiddleware() });
   const result = streamText({
     model,
     providerOptions: {
@@ -23,11 +23,10 @@ export async function POST(request: Request) {
     },
     messages: await convertToModelMessages(messages),
   });
-  /* debugger (consumes stream)
+  /* debugging (will consume the stream, so only use for testing)
   for await (const part of result.fullStream) {
-    if (part.type === 'text-delta') {
-      process.stdout.write(JSON.stringify(part) + '\n');
-    }
-  } */
+    process.stdout.write(JSON.stringify(part) + '\n');
+  }
+  */
   return result.toUIMessageStreamResponse();
 }
