@@ -14,8 +14,8 @@ import {
   PromptInputTools,
   type PromptInputMessage,
 } from "@/components/ai-elements/prompt-input";
-import { DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
+import { AGUIChatTransport } from "@/lib/agui-chat-transport";
 import { Fragment, useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -23,8 +23,8 @@ export default function Home() {
   const [text, setText] = useState("");
 
   const { messages, sendMessage, status, stop } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
+    transport: new AGUIChatTransport({
+      api: process.env.AGUI_BASE_URL || "http://localhost:8000"
     }),
   });
 

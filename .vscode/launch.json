@@ -2,13 +2,36 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "AI.Workspace",
-      "type": "node-terminal",
+      "name": "AI.Web",
+      "type": "node",
       "request": "launch",
-      "command": "npm run dev:turbopack",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "${workspaceFolder}/node_modules/next/dist/bin/next",
+        "dev"
+      ],
       "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
       "sourceMaps": false,
-      "skipFiles": ["<node_internals>/**"]
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!${workspaceFolder}/.next/**",
+        "!**/node_modules/**"
+      ],
+    },
+    {
+      "name": "AGUINewsAgent",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/samples/dotnet/AGUINewsAgent/AGUINewsAgent.csproj",
     }
-  ]
+  ],
+  "compounds": [
+    {
+      "name": "Fullstack",
+      "configurations": ["AI.Web", "AGUINewsAgent"],
+      "stopAll": true
+    }
+  ],
 }

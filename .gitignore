@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!samples/dotnet/AGUINewsAgent/.env.example
+
+# dotnet
+bin/
+obj/
 
 # vercel
 .vercel
