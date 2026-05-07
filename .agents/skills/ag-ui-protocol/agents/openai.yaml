@@ -1,0 +1,4 @@
+interface:
+  display_name: "AG-UI Protocol"
+  short_description: "Agent-user event protocol guidance"
+  default_prompt: "Use $ag-ui-protocol for AG-UI event streams, state, tools, interrupts, and frontend/backend agent interaction."

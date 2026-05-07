@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI.Web Architecture"
+  short_description: "Architecture decisions for AI.Agent"
+  default_prompt: "Use $ai-web-architecture to produce implementation-ready architecture guidance for AI.Agent."
