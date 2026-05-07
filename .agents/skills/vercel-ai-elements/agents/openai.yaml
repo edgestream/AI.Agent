@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vercel AI Elements"
+  short_description: "AI Elements and chat UI guidance"
+  default_prompt: "Use $vercel-ai-elements for AI Elements, shadcn/ui composition, and AI-native UI rendering."

@@ -1,0 +1,12 @@
+interface:
+  display_name: "OpenAI API Project"
+  short_description: "OpenAI API and model guidance"
+  default_prompt: "Use $openai-api-project for OpenAI API, model, streaming, and provider integration work."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "openai-docs"
+      description: "OpenAI Docs MCP server for official OpenAI API and model documentation"
+      transport: "streamable_http"
+      url: "https://developers.openai.com/mcp"
