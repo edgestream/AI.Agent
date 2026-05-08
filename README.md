@@ -9,14 +9,10 @@ Run the web application:
 npm run dev
 ```
 
-Configure an agent server sample by setting the mandatory `OpenAI:ApiKey` in [`appsettings.json`](./samples/dotnet/NewsAgent/appsettings.json):
+Configure the `NewsAgent` sample with ASP.NET Core Secret Manager. Set the required API key:
 
-```appsettings.json
-{
-  "OpenAI": {
-    "ApiKey": "<Your OpenAI API Key>"
-  }
-}
+```bash
+dotnet user-secrets set "OpenAI:ApiKey" "<your OpenAI API key>" --project samples/dotnet/NewsAgent
 ```
 
 Run this agent server in another terminal process:
@@ -25,9 +21,7 @@ Run this agent server in another terminal process:
 dotnet run --project samples/dotnet/NewsAgent
 ```
 
-The browser does not call agent servers directly. It calls the Next.js server at
-`/api/agents/{agent}/agui`; Next.js resolves the agent's configured in-cluster
-AG-UI endpoint from [`agents.json`](./agents.json) and proxies the stream.
+Configure the web application's [`agents.json`](./agents.json) to proxy the streams:
 
 ```json
 {
@@ -37,9 +31,6 @@ AG-UI endpoint from [`agents.json`](./agents.json) and proxies the stream.
   }
 }
 ```
-
-Use `NEXT_PUBLIC_AGENT_ID` to choose the default browser-facing agent id. It
-defaults to `news`.
 
 Open [http://localhost:3000](http://localhost:3000) in the browser.
 
