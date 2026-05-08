@@ -13,6 +13,9 @@ using System.ClientModel;
 
 namespace AI.Agent.Client;
 
+/// <summary>
+/// Provides extension methods for registering IChatClient implementations in an IServiceCollection.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
@@ -28,7 +31,6 @@ public static class ServiceCollectionExtensions
 
         return services.AddOpenAIChatClient(sp => sp.GetRequiredService<IOptions<OpenAISettings>>().Value);
     }
-
     /// <summary>
     /// Adds an IChatClient implementation that uses OpenAI's API to the service collection, using the provided OpenAISettings instance for configuration.
     /// </summary>
@@ -42,7 +44,12 @@ public static class ServiceCollectionExtensions
 
         return services.AddOpenAIChatClient(_ => settings);
     }
-
+    /// <summary>
+    /// Adds an IChatClient implementation that uses OpenAI's API to the service collection, using the provided settings factory to create an OpenAISettings instance for configuration.
+    /// </summary>
+    /// <param name="services">The service collection to which to add the IChatClient.</param>
+    /// <param name="settingsFactory">A factory function that creates an OpenAISettings instance for configuration.</param>
+    /// <returns>The updated service collection.</returns>
     public static IServiceCollection AddOpenAIChatClient(
         this IServiceCollection services,
         Func<IServiceProvider, OpenAISettings> settingsFactory)
@@ -57,14 +64,19 @@ public static class ServiceCollectionExtensions
 
     private static IChatClient CreateOpenAIChatClient(OpenAISettings settings)
     {
-        if (string.IsNullOrWhiteSpace(settings.ApiKey)) throw new InvalidOperationException("OpenAI:ApiKey is required");
+        if (string.IsNullOrWhiteSpace(settings.ApiKey))
+        {
+            throw new InvalidOperationException(
+                "OpenAI:ApiKey is required. For local development, set it with: dotnet user-secrets set \"OpenAI:ApiKey\" \"<your OpenAI API key>\" --project samples/dotnet/NewsAgent");
+        }
+
         var credential = new ApiKeyCredential(settings.ApiKey);
         var options = new OpenAIClientOptions();
         if (!string.IsNullOrEmpty(settings.Endpoint))
         {
             options.Endpoint = new Uri(settings.Endpoint);
         }
-        var client = new OpenAIClient(new ApiKeyCredential(settings.ApiKey), options);
+        var client = new OpenAIClient(credential, options);
         return client.GetResponsesClient().AsIChatClientWithStoredOutputDisabled(settings.Model);
     }
 }

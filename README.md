@@ -3,23 +3,19 @@ Agentic Solution Developer Kit (SDK) using [Next.js](https://nextjs.org/), [Verc
 
 ## Quickstart
 
-Configure an agent server sample by setting the mandatory `OpenAI:ApiKey` in [`appsettings.json`](./samples/dotnet/NewsAgent/appsettings.json):
+Configure the `NewsAgent` sample with ASP.NET Core Secret Manager. Set the required API key:
 
-```appsettings.json
-{
-  "OpenAI": {
-    "ApiKey": "<Your OpenAI API Key>"
-  }
-}
+```bash
+dotnet user-secrets set "OpenAI:ApiKey" "<your OpenAI API key>" --project samples/dotnet/NewsAgent
 ```
 
-Run this agent server in another terminal process:
+Run the agent server:
 
 ```bash
 dotnet run --project samples/dotnet/NewsAgent
 ```
 
-Configure the web application's agents in [`agents.json`](./agents.json):
+Configure the web application's [`agents.json`](./agents.json) to proxy the streams:
 
 ```json
 {
@@ -30,7 +26,7 @@ Configure the web application's agents in [`agents.json`](./agents.json):
 }
 ```
 
-Run the web application:
+Run the web application in another terminal process:
 
 ```bash
 npm run dev
