@@ -8,6 +8,7 @@ Always consider these skills when they match the task:
 
 - `project-baseline`: repository conventions, commands, verification, and feature work expectations.
 - `skill-governance`: boundaries for editing `AGENTS.md`, repo skills, and coding-agent instructions.
+- `github-issue`: GitHub issue creation workflow for assignees, labels, issue type, project #6 metadata, and dependency relationships.
 - `ai-web-architecture`: cross-cutting architecture decisions and implementation direction.
 - `vercel-nextjs`: Next.js App Router, Server Components, routing, actions, caching, and rendering strategy.
 - `vercel-ai-sdk`: Vercel AI SDK streaming, tool calling, providers, model setup, and AI SDK DevTools.
