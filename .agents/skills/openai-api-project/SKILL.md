@@ -1,6 +1,6 @@
 ---
 name: openai-api-project
-description: Use for OpenAI API work in AI.Agent, including model selection, Responses API behavior, OpenAI provider configuration through Vercel AI SDK, streaming, tool calls, structured outputs, prompts, safety, environment variables, and migration to current OpenAI models.
+description: Use for OpenAI API work, including model selection, Responses API behavior, provider configuration through Vercel AI SDK or .NET clients, streaming, tool calls, structured outputs, prompts, safety, environment variables, and migration to current OpenAI models.
 ---
 
 # OpenAI API Project
@@ -11,7 +11,7 @@ Use this skill whenever a task touches model selection, prompts, OpenAI provider
 
 Use the configured OpenAI Docs MCP server for current OpenAI API docs and model guidance before changing model-specific behavior.
 
-## AI.Agent defaults
+## Defaults
 
 - Keep OpenAI API access server-side.
 - Use environment variables for provider base URL and model names.
@@ -20,12 +20,6 @@ Use the configured OpenAI Docs MCP server for current OpenAI API docs and model 
 - Keep prompts and system instructions reviewable; avoid burying critical behavior in UI copy.
 - Preserve streaming behavior unless the issue explicitly changes the interaction model.
 - Treat model upgrades as behavior changes that need verification.
-
-## Current integration notes
-
-- `src/app/api/chat/route.ts` uses `createOpenAI`, `openai.responses`, `wrapLanguageModel`, `devToolsMiddleware`, and `streamText`.
-- The default model currently falls back to `gpt-5.4`.
-- The route currently passes `store: false`.
 
 ## Docs
 

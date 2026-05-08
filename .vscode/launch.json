@@ -2,13 +2,36 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "AI.Workspace",
-      "type": "node-terminal",
+      "name": "Web",
+      "type": "node",
       "request": "launch",
-      "command": "npm run dev:turbopack",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "${workspaceFolder}/node_modules/next/dist/bin/next",
+        "dev"
+      ],
       "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
       "sourceMaps": false,
-      "skipFiles": ["<node_internals>/**"]
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!${workspaceFolder}/.next/**",
+        "!**/node_modules/**"
+      ],
+    },
+    {
+      "name": "NewsAgent",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/samples/dotnet/NewsAgent/NewsAgent.csproj"
     }
-  ]
+  ],
+  "compounds": [
+    {
+      "name": "Fullstack",
+      "configurations": ["Web", "NewsAgent"],
+      "stopAll": true
+    }
+  ],
 }

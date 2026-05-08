@@ -1,11 +1,11 @@
 ---
 name: aspnet-core-project
-description: Use when AI.Agent work involves ASP.NET Core, .NET web APIs, Minimal APIs, controllers, middleware, hosting, configuration, authentication, authorization, SignalR, gRPC, testing, deployment, or integration with a .NET backend service.
+description: Use when work involves ASP.NET Core, .NET web APIs, Minimal APIs, controllers, middleware, hosting, configuration, authentication, authorization, SignalR, gRPC, testing, deployment, or integration with a .NET backend service.
 ---
 
 # ASP.NET Core Project
 
-Use this skill when a feature introduces, changes, or integrates an ASP.NET Core service. This repository is currently a Next.js app, so .NET guidance usually applies to planned backend services, integration contracts, or architecture decisions.
+Use this skill when a feature introduces, changes, or integrates an ASP.NET Core service. This includes .NET web APIs, Minimal APIs, hosting, configuration, middleware, and integration contracts.
 
 ## Research rule
 
@@ -19,6 +19,12 @@ Use the configured Microsoft Learn MCP server for current ASP.NET Core guidance 
 - Keep middleware focused on cross-cutting HTTP concerns.
 - Make authentication and authorization policy decisions explicit in architecture notes.
 - Add integration tests for public HTTP behavior when a .NET backend exists.
+
+## VS Code debugging
+
+- When a repo uses a VS Code C# Dev Kit launch config with `"type": "dotnet"`, prefer `Properties/launchSettings.json` for per-profile debug environment changes.
+- For ASP.NET Core logging duplication during VS Code debugging, suppress the `Debug` logger in the relevant launch profile with `environmentVariables`, for example `Logging__Debug__LogLevel__Default=None`, instead of inventing unsupported `launch.json` properties.
+- Keep `.vscode/launch.json` minimal for `dotnet` profiles and use it mainly to point at the project; let `launchSettings.json` carry supported profile settings such as `environmentVariables`, `applicationUrl`, and `commandLineArgs`.
 
 ## Integration with the Next.js app
 

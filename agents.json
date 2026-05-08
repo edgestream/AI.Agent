@@ -1,0 +1,6 @@
+{
+  "news": {
+    "protocol": "AGUI",
+    "endpoint": "http://localhost:8000"
+  }
+}

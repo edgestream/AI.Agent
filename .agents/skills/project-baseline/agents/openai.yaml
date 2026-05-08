@@ -1,4 +1,0 @@
-interface:
-  display_name: "Project Baseline"
-  short_description: "AI.Agent repo conventions and verification"
-  default_prompt: "Use $project-baseline for AI.Agent structure, commands, conventions, and verification expectations."
