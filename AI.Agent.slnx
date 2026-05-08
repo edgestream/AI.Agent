@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="dotnet/src/AI.Agent.Client/AI.Agent.Client.csproj" />
+  <Project Path="samples/dotnet/NewsAgent/NewsAgent.csproj" />
+</Solution>

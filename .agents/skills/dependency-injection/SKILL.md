@@ -1,6 +1,6 @@
 ---
 name: dependency-injection
-description: Use for dependency injection design in AI.Agent and related .NET services, including service lifetimes, registration methods, options pattern, factories, service locator avoidance, test seams, middleware injection, scoped services, and ASP.NET Core DI.
+description: Use for dependency injection design, including service lifetimes, registration methods, options pattern, factories, service locator avoidance, test seams, middleware injection, scoped services, and ASP.NET Core DI.
 ---
 
 # Dependency Injection

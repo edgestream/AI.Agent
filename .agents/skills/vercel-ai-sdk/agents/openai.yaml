@@ -1,4 +1,0 @@
-interface:
-  display_name: "Vercel AI SDK"
-  short_description: "AI SDK streaming and provider guidance"
-  default_prompt: "Use $vercel-ai-sdk for AI SDK v6 streaming, tool calling, providers, and DevTools guidance."

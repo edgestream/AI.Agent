@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "AI.Web",
+      "name": "Web",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "node",
@@ -21,16 +21,16 @@
       ],
     },
     {
-      "name": "AGUINewsAgent",
+      "name": "NewsAgent",
       "type": "dotnet",
       "request": "launch",
-      "projectPath": "${workspaceFolder}/samples/dotnet/AGUINewsAgent/AGUINewsAgent.csproj",
+      "projectPath": "${workspaceFolder}/samples/dotnet/NewsAgent/NewsAgent.csproj"
     }
   ],
   "compounds": [
     {
       "name": "Fullstack",
-      "configurations": ["AI.Web", "AGUINewsAgent"],
+      "configurations": ["Web", "NewsAgent"],
       "stopAll": true
     }
   ],

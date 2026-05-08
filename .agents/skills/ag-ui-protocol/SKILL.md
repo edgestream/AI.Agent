@@ -1,11 +1,11 @@
 ---
 name: ag-ui-protocol
-description: Use for AG-UI Protocol work in AI.Agent, including agent-user event streams, frontend/backend agent interaction, state synchronization, messages, tools, interrupts, reasoning visibility, stream serialization, human-in-the-loop workflows, and Direct to LLM integration.
+description: Use for AG-UI Protocol work, including agent-user event streams, frontend/backend agent interaction, state synchronization, messages, tools, interrupts, reasoning visibility, stream serialization, human-in-the-loop workflows, and Direct to LLM integration.
 ---
 
 # AG-UI Protocol
 
-AG-UI is an open, lightweight, event-based protocol for connecting user-facing applications to agentic backends. Use it when AI.Agent needs a formal frontend/backend agent interaction contract rather than ad hoc chat messages.
+AG-UI is an open, lightweight, event-based protocol for connecting user-facing applications to agentic backends. Use it when a feature needs a formal frontend/backend agent interaction contract rather than ad hoc chat messages.
 
 ## Research rule
 
@@ -24,7 +24,7 @@ Then load only the relevant docs page for the task, such as events, state, tools
 - Make interrupts and resumes explicit; do not hide human-in-the-loop states inside generic text messages.
 - Keep reasoning visibility intentional and policy-aware.
 
-## AI.Agent integration questions
+## Integration questions
 
 - Does this feature need raw AI SDK UIMessage streaming, AG-UI events, or both?
 - Which message parts map cleanly to existing AI Elements renderers?

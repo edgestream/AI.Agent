@@ -21,10 +21,11 @@ import { toast } from "sonner";
 
 export default function Home() {
   const [text, setText] = useState("");
+  const agentId = process.env.NEXT_PUBLIC_AGENT_ID || "news";
 
   const { messages, sendMessage, status, stop } = useChat({
     transport: new AGUIChatTransport({
-      api: process.env.AGUI_BASE_URL || "http://localhost:8000"
+      api: `/api/agents/${agentId}/agui`,
     }),
   });
 
