@@ -3,12 +3,6 @@ Agentic Solution Developer Kit (SDK) using [Next.js](https://nextjs.org/), [Verc
 
 ## Quickstart
 
-Run the web application:
-
-```bash
-npm run dev
-```
-
 Configure an agent server sample by setting the mandatory `OpenAI:ApiKey` in [`appsettings.json`](./samples/dotnet/NewsAgent/appsettings.json):
 
 ```appsettings.json
@@ -25,9 +19,7 @@ Run this agent server in another terminal process:
 dotnet run --project samples/dotnet/NewsAgent
 ```
 
-The browser does not call agent servers directly. It calls the Next.js server at
-`/api/agents/{agent}/agui`; Next.js resolves the agent's configured in-cluster
-AG-UI endpoint from [`agents.json`](./agents.json) and proxies the stream.
+Configure the web application's agents in [`agents.json`](./agents.json):
 
 ```json
 {
@@ -38,8 +30,11 @@ AG-UI endpoint from [`agents.json`](./agents.json) and proxies the stream.
 }
 ```
 
-Use `NEXT_PUBLIC_AGENT_ID` to choose the default browser-facing agent id. It
-defaults to `news`.
+Run the web application:
+
+```bash
+npm run dev
+```
 
 Open [http://localhost:3000](http://localhost:3000) in the browser.
 
