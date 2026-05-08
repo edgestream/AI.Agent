@@ -4,9 +4,33 @@ import { join } from "node:path";
 type AgentConfiguration = {
   protocol: "AGUI";
   endpoint: string;
+  label?: string;
+  description?: string;
+  icon?: string;
+  default?: boolean;
 };
 
 type AgentRegistry = Record<string, AgentConfiguration>;
+
+export type AgentChooserOption = {
+  id: string;
+  label: string;
+  description?: string;
+  icon?: string;
+  default: boolean;
+};
+
+const validateOptionalString = (
+  agentId: string,
+  value: unknown,
+  fieldName: "label" | "description" | "icon"
+) => {
+  if (value !== undefined && (typeof value !== "string" || !value)) {
+    throw new Error(
+      `Agent '${agentId}' ${fieldName} must be a non-empty string.`
+    );
+  }
+};
 
 const loadAgentRegistry = (): AgentRegistry => {
   const registryPath = join(process.cwd(), "agents.json");
@@ -15,6 +39,8 @@ const loadAgentRegistry = (): AgentRegistry => {
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
     throw new Error("agents.json must contain an object.");
   }
+
+  let defaultAgentId: string | undefined;
 
   for (const [agentId, configuration] of Object.entries(parsed)) {
     if (
@@ -33,6 +59,27 @@ const loadAgentRegistry = (): AgentRegistry => {
     if (typeof candidate.endpoint !== "string" || !candidate.endpoint) {
       throw new Error(`Agent '${agentId}' endpoint is required.`);
     }
+
+    validateOptionalString(agentId, candidate.label, "label");
+    validateOptionalString(agentId, candidate.description, "description");
+    validateOptionalString(agentId, candidate.icon, "icon");
+
+    if (
+      candidate.default !== undefined &&
+      typeof candidate.default !== "boolean"
+    ) {
+      throw new Error(`Agent '${agentId}' default must be a boolean.`);
+    }
+
+    if (candidate.default) {
+      if (defaultAgentId) {
+        throw new Error(
+          `Only one agent can be marked as default. Found '${defaultAgentId}' and '${agentId}'.`
+        );
+      }
+
+      defaultAgentId = agentId;
+    }
   }
 
   return parsed as AgentRegistry;
@@ -47,4 +94,27 @@ export const getAgentEndpoint = (agentId: string): URL => {
   }
 
   return new URL(configuration.endpoint);
+};
+
+export const getAgentChooserOptions = (): AgentChooserOption[] => {
+  const options = Object.entries(agentRegistry).map(
+    ([id, configuration]): AgentChooserOption => ({
+      id,
+      label: configuration.label ?? id,
+      description: configuration.description,
+      icon: configuration.icon,
+      default: configuration.default ?? false,
+    })
+  );
+
+  if (options.length === 0) {
+    throw new Error("agents.json must configure at least one agent.");
+  }
+
+  return options;
+};
+
+export const getDefaultAgentId = (): string => {
+  const agents = getAgentChooserOptions();
+  return agents.find((agent) => agent.default)?.id ?? agents[0].id;
 };

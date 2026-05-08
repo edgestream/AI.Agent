@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <UserSecretsId>8abdb05f-d13c-4a99-bd47-809b20f9e807</UserSecretsId>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore" Version="1.4.0-preview.260505.1" />
+    <ProjectReference Include="..\..\..\dotnet\src\AI.Agent.Client\AI.Agent.Client.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,17 @@
 {
   "news": {
     "protocol": "AGUI",
-    "endpoint": "http://localhost:8000"
+    "endpoint": "http://localhost:8000",
+    "label": "News",
+    "description": "Fictional satirical headlines",
+    "icon": "news",
+    "default": true
+  },
+  "weather": {
+    "protocol": "AGUI",
+    "endpoint": "http://localhost:8001",
+    "label": "Weather",
+    "description": "Forecasts and weather Q&A",
+    "icon": "cloud-sun"
   }
 }
