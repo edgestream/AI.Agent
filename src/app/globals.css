@@ -4,6 +4,12 @@
 @import "shadcn/tailwind.css";
 @source "../node_modules/streamdown/dist/*.js";
 
+@font-face {
+  font-family: "codicon";
+  font-display: block;
+  src: url("/fonts/codicon.ttf") format("truetype");
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -145,6 +151,22 @@
   font-size: 20px;
   -webkit-font-smoothing: antialiased;
   font-variation-settings: "FILL" 0;
+}
+
+.codicon {
+  font: normal normal normal 16px/1 codicon;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.codicon-agent::before {
+  content: "\ec67";
 }
 
 @keyframes shimmer {

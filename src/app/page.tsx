@@ -151,17 +151,10 @@ export default function Home() {
                   tooltip="Select agent"
                 >
                   {!selectedAgent?.icon || selectedAgent.icon === "default" ? (
-                    <svg
+                    <span
                       aria-hidden="true"
-                      className="size-4 shrink-0"
-                      fill="none"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M10.887 15H8.5a.5.5 0 0 1 0-1h2.387a.999.999 0 0 0 .865-.5l2.888-5a.998.998 0 0 0 0-1l-2.935-5.084A.837.837 0 0 0 10.983 2a.828.828 0 0 0-.795.587l-3.422 11.12A1.821 1.821 0 0 1 5.016 15a1.838 1.838 0 0 1-1.587-.916L.495 9a2.001 2.001 0 0 1 0-2l2.887-5c.355-.617 1.019-1 1.731-1H7.5a.5.5 0 0 1 0 1H5.113a.999.999 0 0 0-.865.5l-2.888 5a.998.998 0 0 0 0 1l2.935 5.084a.835.835 0 0 0 .722.416.828.828 0 0 0 .795-.588L9.234 2.293A1.82 1.82 0 0 1 10.984 1c.652 0 1.261.351 1.587.916L15.506 7a2.003 2.003 0 0 1 0 2.001L12.619 14c-.355.617-1.02 1-1.732 1Z"
-                        fill="currentColor"
-                      />
-                    </svg>
+                      className="codicon codicon-agent size-4 shrink-0"
+                    />
                   ) : (
                     <span
                       aria-hidden="true"
@@ -183,17 +176,10 @@ export default function Home() {
                       onSelect={() => setSelectedAgentId(agent.id)}
                     >
                       {!agent.icon || agent.icon === "default" ? (
-                        <svg
+                        <span
                           aria-hidden="true"
-                          className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-                          fill="none"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M10.887 15H8.5a.5.5 0 0 1 0-1h2.387a.999.999 0 0 0 .865-.5l2.888-5a.998.998 0 0 0 0-1l-2.935-5.084A.837.837 0 0 0 10.983 2a.828.828 0 0 0-.795.587l-3.422 11.12A1.821 1.821 0 0 1 5.016 15a1.838 1.838 0 0 1-1.587-.916L.495 9a2.001 2.001 0 0 1 0-2l2.887-5c.355-.617 1.019-1 1.731-1H7.5a.5.5 0 0 1 0 1H5.113a.999.999 0 0 0-.865.5l-2.888 5a.998.998 0 0 0 0 1l2.935 5.084a.835.835 0 0 0 .722.416.828.828 0 0 0 .795-.588L9.234 2.293A1.82 1.82 0 0 1 10.984 1c.652 0 1.261.351 1.587.916L15.506 7a2.003 2.003 0 0 1 0 2.001L12.619 14c-.355.617-1.02 1-1.732 1Z"
-                            fill="currentColor"
-                          />
-                        </svg>
+                          className="codicon codicon-agent mt-0.5 size-4 shrink-0 text-muted-foreground"
+                        />
                       ) : (
                         <span
                           aria-hidden="true"
