@@ -3,27 +3,17 @@ Agentic Solution Developer Kit (SDK) using [Next.js](https://nextjs.org/), [Verc
 
 ## Quickstart
 
-Configure the `NewsAgent` sample with ASP.NET Core Secret Manager. Set the required API key:
+Configure the sample agents with ASP.NET Core Secret Manager. Set the required API key for each agent you want to run:
 
 ```bash
-dotnet user-secrets set "OpenAI:ApiKey" "<your OpenAI API key>" --project samples/dotnet/NewsAgent
+dotnet user-secrets set "OpenAI:ApiKey" "<your OpenAI API key>" --project samples/dotnet/GenericAgent
 ```
 
-Run the agent server:
+Run the agent servers in separate terminal processes:
 
 ```bash
-dotnet run --project samples/dotnet/NewsAgent
-```
-
-Configure the web application's [`agents.json`](./agents.json) to proxy the streams:
-
-```json
-{
-  "news": {
-    "protocol": "AGUI",
-    "endpoint": "http://localhost:8000"
-  }
-}
+dotnet run --project samples/dotnet/GenericAgent
+dotnet run --project samples/dotnet/WeatherAgent
 ```
 
 Run the web application in another terminal process:
@@ -33,6 +23,8 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in the browser.
+
+In `agents.json`, set `icon` to `default` to use the built-in VS Code-style agent glyph for a generic agent. Any other `icon` value is rendered from Material Symbols, for example `partly_cloudy_day`.
 
 ## Build
 

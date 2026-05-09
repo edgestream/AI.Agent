@@ -1,6 +1,5 @@
 ﻿using AI.Agent.Client.Configuration;
 using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -64,12 +63,7 @@ public static class ServiceCollectionExtensions
 
     private static IChatClient CreateOpenAIChatClient(OpenAISettings settings)
     {
-        if (string.IsNullOrWhiteSpace(settings.ApiKey))
-        {
-            throw new InvalidOperationException(
-                "OpenAI:ApiKey is required. For local development, set it with: dotnet user-secrets set \"OpenAI:ApiKey\" \"<your OpenAI API key>\" --project samples/dotnet/NewsAgent");
-        }
-
+        if (string.IsNullOrWhiteSpace(settings.ApiKey)) throw new InvalidOperationException("ApiKey is required.");
         var credential = new ApiKeyCredential(settings.ApiKey);
         var options = new OpenAIClientOptions();
         if (!string.IsNullOrEmpty(settings.Endpoint))

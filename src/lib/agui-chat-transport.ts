@@ -8,7 +8,7 @@ import type {
 } from "ai";
 
 type AGUIChatTransportOptions = {
-  api: string;
+  api: string | (() => string);
   headers?: HeadersInit;
   credentials?: RequestCredentials;
   fetch?: typeof fetch;
@@ -32,7 +32,7 @@ type AGUIEvent = {
 };
 
 export class AGUIChatTransport implements ChatTransport<UIMessage> {
-  private readonly api: string;
+  private api: string | (() => string);
   private readonly headers?: HeadersInit;
   private readonly credentials?: RequestCredentials;
   private readonly fetch: typeof fetch;
@@ -57,7 +57,7 @@ export class AGUIChatTransport implements ChatTransport<UIMessage> {
     body,
     metadata,
   }: SendMessagesOptions): Promise<ReadableStream<UIMessageChunk>> {
-    const response = await this.fetch(this.api, {
+    const response = await this.fetch(resolveApi(this.api), {
       method: "POST",
       credentials: this.credentials,
       headers: {
@@ -97,7 +97,14 @@ export class AGUIChatTransport implements ChatTransport<UIMessage> {
   async reconnectToStream(): Promise<ReadableStream<UIMessageChunk> | null> {
     return null;
   }
+
+  setApi(api: string | (() => string)) {
+    this.api = api;
+  }
 }
+
+const resolveApi = (api: string | (() => string)) =>
+  typeof api === "function" ? api() : api;
 
 const toAGUIMessages = (messages: UIMessage[]): AGUIMessage[] =>
   messages
