@@ -6,40 +6,15 @@ Agentic Solution Developer Kit (SDK) using [Next.js](https://nextjs.org/), [Verc
 Configure the sample agents with ASP.NET Core Secret Manager. Set the required API key for each agent you want to run:
 
 ```bash
-dotnet user-secrets set "OpenAI:ApiKey" "<your OpenAI API key>" --project samples/dotnet/NewsAgent
-dotnet user-secrets set "OpenAI:ApiKey" "<your OpenAI API key>" --project samples/dotnet/WeatherAgent
+dotnet user-secrets set "OpenAI:ApiKey" "<your OpenAI API key>" --project samples/dotnet/GenericAgent
 ```
 
 Run the agent servers in separate terminal processes:
 
 ```bash
-dotnet run --project samples/dotnet/NewsAgent
+dotnet run --project samples/dotnet/GenericAgent
 dotnet run --project samples/dotnet/WeatherAgent
 ```
-
-Configure the web application's [`agents.json`](./agents.json) to proxy the streams and provide chooser metadata:
-
-```json
-{
-  "news": {
-    "protocol": "AGUI",
-    "endpoint": "http://localhost:8000",
-    "label": "News",
-    "description": "Fictional satirical headlines",
-    "icon": "news",
-    "default": true
-  },
-  "weather": {
-    "protocol": "AGUI",
-    "endpoint": "http://localhost:8001",
-    "label": "Weather",
-    "description": "Forecasts and weather Q&A",
-    "icon": "cloud-sun"
-  }
-}
-```
-
-Add another agent by adding an entry to `agents.json` with a unique id, `protocol: "AGUI"`, its same-machine or in-cluster `endpoint`, and optional `label`, `description`, `icon`, and `default` metadata. The browser only receives the chooser metadata; it continues to send prompts through same-origin `/api/agents/{agent}/agui` routes.
 
 Run the web application in another terminal process:
 
@@ -48,6 +23,8 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in the browser.
+
+In `agents.json`, set `icon` to `default` to use the built-in VS Code-style agent glyph for a generic agent. Any other `icon` value is rendered from Material Symbols, for example `partly_cloudy_day`.
 
 ## Build
 

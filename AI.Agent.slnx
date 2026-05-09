@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="dotnet/src/AI.Agent.Client/AI.Agent.Client.csproj" />
+  <Project Path="samples/dotnet/GenericAgent/GenericAgent.csproj" />
   <Project Path="samples/dotnet/NewsAgent/NewsAgent.csproj" />
   <Project Path="samples/dotnet/WeatherAgent/WeatherAgent.csproj" />
 </Solution>

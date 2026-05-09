@@ -1,17 +1,24 @@
 {
-  "news": {
+  "generic": {
     "protocol": "AGUI",
     "endpoint": "http://localhost:8000",
+    "label": "Agent",
+    "description": "Helpful assistant",
+    "icon": "default",
+    "default": true
+  },
+  "news": {
+    "protocol": "AGUI",
+    "endpoint": "http://localhost:8001",
     "label": "News",
     "description": "Fictional satirical headlines",
-    "icon": "news",
-    "default": true
+    "icon": "newspaper"
   },
   "weather": {
     "protocol": "AGUI",
-    "endpoint": "http://localhost:8001",
+    "endpoint": "http://localhost:8002",
     "label": "Weather",
-    "description": "Forecasts and weather Q&A",
-    "icon": "cloud-sun"
+    "description": "Weather and forecast information",
+    "icon": "partly_cloudy_day"
   }
 }

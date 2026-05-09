@@ -21,16 +21,28 @@
       ],
     },
     {
+      "name": "GenericAgent",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/samples/dotnet/GenericAgent/GenericAgent.csproj"
+    },
+    {
       "name": "NewsAgent",
       "type": "dotnet",
       "request": "launch",
       "projectPath": "${workspaceFolder}/samples/dotnet/NewsAgent/NewsAgent.csproj"
+    },
+    {
+      "name": "WeatherAgent",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/samples/dotnet/WeatherAgent/WeatherAgent.csproj"
     }
   ],
   "compounds": [
     {
       "name": "Fullstack",
-      "configurations": ["Web", "NewsAgent"],
+      "configurations": ["Web", "GenericAgent", "NewsAgent", "WeatherAgent"],
       "stopAll": true
     }
   ],
