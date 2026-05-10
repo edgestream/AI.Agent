@@ -23,11 +23,12 @@ Prefer official docs and configured MCP servers for fast-moving frameworks. The 
 Current architecture notes:
 
 - Browser code must not call AG-UI agent servers directly. The browser calls same-origin Next.js route handlers under `/api/agents/{agent}/agui`.
-- Agent endpoints are configured in root [`agents.json`](./agents.json). The current schema maps an agent id to `{ "protocol": "AGUI", "endpoint": "..." }`.
+- Agent endpoints are configured in root [`agents.json`](./agents.json). The current schema maps an agent id to AG-UI protocol, endpoint, and UI metadata.
 - `src/lib/agent-registry.ts` is the server-side registry reader for `agents.json`. It lives in `src/lib`, not `src/lib/server`.
+- `src/app/api/agents/route.ts` exposes configured agent metadata to the frontend without exposing backend-only implementation details.
 - `src/app/api/agents/[agent]/agui/route.ts` proxies AG-UI requests and streams the backend response. Do not add frontend capability discovery unless the architecture is explicitly changed.
 - .NET projects are included in the root [`AI.Agent.slnx`](./AI.Agent.slnx), so `dotnet build` should work from the repository root.
 - `dotnet/src/AI.Agent.Client` contains shared .NET client/provider registration helpers. Samples should consume this library instead of constructing OpenAI clients inline.
-- `samples/dotnet/NewsAgent` is the current .NET AG-UI sample. The old `AGUINewsAgent` sample and `samples/dotnet/Samples.slnx` have been replaced.
+- `samples/dotnet/GenericAgent`, `samples/dotnet/NewsAgent`, and `samples/dotnet/WeatherAgent` are the current .NET AG-UI samples. The old `AGUINewsAgent` sample and `samples/dotnet/Samples.slnx` have been replaced.
 
-Before implementing a feature, read the issue or task directions and keep edits tightly scoped. Run `npm run lint` for normal UI/code changes and `npm run build` when touching routing, server code, configuration, or package dependencies. Run `dotnet build` when touching any .NET library, sample, solution, configuration, or launch profile.
+Before implementing a feature, read the issue or task directions and keep edits tightly scoped. Run `npm run lint` for normal UI/code changes, `npm run test:transport` when touching AG-UI chat transport behavior, and `npm run build` when touching routing, server code, configuration, or package dependencies. Run `dotnet build` when touching any .NET library, sample, solution, configuration, or launch profile.

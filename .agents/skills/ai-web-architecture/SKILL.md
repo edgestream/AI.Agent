@@ -14,7 +14,7 @@ Use this skill whenever a task affects more than one layer, changes public behav
 - Favor explicit server/client boundaries in Next.js App Router.
 - Treat streaming protocol changes, AG-UI event flow, model provider behavior, and dependency lifetimes as architecture decisions.
 - Prefer same-origin browser interactions. Browser code should reach agent backends through Next.js route handlers, not direct cross-origin AG-UI calls.
-- Keep durable agent routing in explicit configuration, currently root `agents.json`, rather than hidden environment-variable maps.
+- Keep durable agent routing and frontend agent metadata in explicit configuration, currently root `agents.json`, rather than hidden environment-variable maps.
 - Use official docs and MCP before relying on memory for fast-moving APIs.
 
 ## Decision output
@@ -43,8 +43,10 @@ When architecture work leads to implementation:
 
 - Next.js and React UI behavior belongs in `src/app` and `src/components`.
 - Generic AI SDK chat behavior currently enters through `src/app/api/chat/route.ts`.
+- Frontend agent metadata enters through `src/app/api/agents/route.ts`.
 - AG-UI browser traffic enters through `src/app/api/agents/[agent]/agui/route.ts`, which resolves configured endpoints with `src/lib/agent-registry.ts`.
-- Root `agents.json` is the current frontend-server source of truth for agent id, protocol, and endpoint.
+- Root `agents.json` is the current frontend-server source of truth for agent id, protocol, endpoint, and display metadata.
+- AG-UI stream-to-chat adaptation belongs in `src/lib/agui-chat-transport.ts`; changes to that contract should keep transport tests current.
 - AI-native UI should compose existing AI Elements components before adding custom renderers.
 - `AI.Agent.Client` is the project-owned .NET provider/client registration boundary; samples should not construct provider clients inline.
 - ASP.NET Core and DI guidance applies when adding or integrating .NET backend services and shared .NET client registration.
