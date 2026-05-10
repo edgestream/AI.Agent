@@ -1,3 +1,3 @@
 # NewsAgent
 
-Sample AG-UI agent server for fictional satirical news output.
+Sample AG-UI agent server for news search.

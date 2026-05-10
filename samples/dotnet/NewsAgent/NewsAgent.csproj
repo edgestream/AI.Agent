@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore" Version="1.4.0-preview.260505.1" />
-    <ProjectReference Include="..\..\..\dotnet\src\AI.Agent.Client\AI.Agent.Client.csproj" />
+    <ProjectReference Include="../../../dotnet/src/AI.Agent.Client/AI.Agent.Client.csproj" />
   </ItemGroup>
 
 </Project>

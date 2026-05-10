@@ -5,6 +5,7 @@ import {
   MessageContent,
   MessageResponse,
 } from "@/components/ai-elements/message";
+import { isToolPart, Tool } from "@/components/ai-elements/tool";
 import {
   PromptInput,
   PromptInputActionMenu,
@@ -113,15 +114,19 @@ export default function Home() {
             <Message from={message.role} key={message.id}>
               <MessageContent>
                 {message.parts.map((part, index) => {
-                  if (part.type !== "text") {
-                    return null;
+                  if (part.type === "text") {
+                    return (
+                      <Fragment key={`${message.id}-${index}`}>
+                        <MessageResponse>{part.text}</MessageResponse>
+                      </Fragment>
+                    );
                   }
 
-                  return (
-                    <Fragment key={`${message.id}-${index}`}>
-                      <MessageResponse>{part.text}</MessageResponse>
-                    </Fragment>
-                  );
+                  if (isToolPart(part)) {
+                    return <Tool key={`${message.id}-${index}`} part={part} />;
+                  }
+
+                  return null;
                 })}
               </MessageContent>
             </Message>

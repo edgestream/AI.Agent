@@ -29,6 +29,9 @@ type AGUIEvent = {
   message?: string;
   error?: string;
   messageText?: string;
+  toolCallId?: string;
+  toolCallName?: string;
+  content?: string;
 };
 
 export class AGUIChatTransport implements ChatTransport<UIMessage> {
@@ -210,64 +213,205 @@ class AGUIEventToUIMessageChunkStream extends TransformStream<
 > {
   constructor() {
     const textPartIds = new Map<string, string>();
+    const toolCalls = new Map<string, ToolCallState>();
 
     super({
       transform(event, controller) {
-        switch (event.type) {
-          case EventType.RUN_STARTED:
-            controller.enqueue({ type: "start" });
-            break;
-          case EventType.TEXT_MESSAGE_START: {
-            const textId = getTextPartId(textPartIds, event.messageId);
-            controller.enqueue({ type: "text-start", id: textId });
-            break;
-          }
-          case EventType.TEXT_MESSAGE_CONTENT: {
-            const textId = getTextPartId(textPartIds, event.messageId);
-            controller.enqueue({
-              type: "text-delta",
-              id: textId,
-              delta: event.delta ?? "",
-            });
-            break;
-          }
-          case EventType.TEXT_MESSAGE_END: {
-            const textId = getTextPartId(textPartIds, event.messageId);
-            controller.enqueue({ type: "text-end", id: textId });
-            break;
-          }
-          case EventType.TEXT_MESSAGE_CHUNK: {
-            const hadTextPartId = textPartIds.has(event.messageId ?? "default");
-            const textId = getTextPartId(textPartIds, event.messageId);
-            if (!hadTextPartId) {
-              controller.enqueue({ type: "text-start", id: textId });
-            }
-            controller.enqueue({
-              type: "text-delta",
-              id: textId,
-              delta: event.delta ?? "",
-            });
-            break;
-          }
-          case EventType.RUN_FINISHED:
-            controller.enqueue({ type: "finish-step" });
-            controller.enqueue({ type: "finish" });
-            break;
-          case EventType.RUN_ERROR:
-            controller.enqueue({
-              type: "error",
-              errorText:
-                event.message ??
-                event.messageText ??
-                event.error ??
-                "AG-UI run failed.",
-            });
-            break;
+        for (const chunk of aguiEventToUIMessageChunks(
+          event,
+          textPartIds,
+          toolCalls
+        )) {
+          controller.enqueue(chunk);
         }
       },
     });
   }
 }
+
+type ToolCallState = {
+  id: string;
+  name: string;
+  inputText: string;
+  inputAvailable: boolean;
+};
+
+export const aguiEventToUIMessageChunks = (
+  event: AGUIEvent,
+  textPartIds = new Map<string, string>(),
+  toolCalls = new Map<string, ToolCallState>()
+): UIMessageChunk[] => {
+  switch (event.type) {
+    case EventType.RUN_STARTED:
+      return [{ type: "start" }];
+    case EventType.TEXT_MESSAGE_START: {
+      const textId = getTextPartId(textPartIds, event.messageId);
+      return [{ type: "text-start", id: textId }];
+    }
+    case EventType.TEXT_MESSAGE_CONTENT: {
+      const textId = getTextPartId(textPartIds, event.messageId);
+      return [
+        {
+          type: "text-delta",
+          id: textId,
+          delta: event.delta ?? "",
+        },
+      ];
+    }
+    case EventType.TEXT_MESSAGE_END: {
+      const textId = getTextPartId(textPartIds, event.messageId);
+      return [{ type: "text-end", id: textId }];
+    }
+    case EventType.TEXT_MESSAGE_CHUNK: {
+      const hadTextPartId = textPartIds.has(event.messageId ?? "default");
+      const textId = getTextPartId(textPartIds, event.messageId);
+      return [
+        ...(hadTextPartId ? [] : [{ type: "text-start" as const, id: textId }]),
+        {
+          type: "text-delta",
+          id: textId,
+          delta: event.delta ?? "",
+        },
+      ];
+    }
+    case EventType.TOOL_CALL_START: {
+      const toolCall = getToolCallState(toolCalls, event);
+      return [
+        {
+          type: "tool-input-start",
+          toolCallId: toolCall.id,
+          toolName: toolCall.name,
+        },
+      ];
+    }
+    case EventType.TOOL_CALL_ARGS: {
+      const toolCall = getToolCallState(toolCalls, event);
+      const delta = event.delta ?? "";
+      toolCall.inputText += delta;
+      return [
+        {
+          type: "tool-input-delta",
+          toolCallId: toolCall.id,
+          inputTextDelta: delta,
+        },
+      ];
+    }
+    case EventType.TOOL_CALL_END: {
+      const toolCall = getToolCallState(toolCalls, event);
+      toolCall.inputAvailable = true;
+      return [
+        {
+          type: "tool-input-available",
+          toolCallId: toolCall.id,
+          toolName: toolCall.name,
+          input: parseToolInput(toolCall.inputText),
+        },
+      ];
+    }
+    case EventType.TOOL_CALL_CHUNK:
+      return toolCallChunkToUIMessageChunks(event, toolCalls);
+    case EventType.TOOL_CALL_RESULT: {
+      const toolCall = getToolCallState(toolCalls, event);
+      const chunks: UIMessageChunk[] = [];
+
+      if (!toolCall.inputAvailable) {
+        toolCall.inputAvailable = true;
+        chunks.push({
+          type: "tool-input-available",
+          toolCallId: toolCall.id,
+          toolName: toolCall.name,
+          input: parseToolInput(toolCall.inputText),
+        });
+      }
+
+      chunks.push({
+        type: "tool-output-available",
+        toolCallId: toolCall.id,
+        output: event.content ?? "",
+      });
+
+      return chunks;
+    }
+    case EventType.RUN_FINISHED:
+      return [{ type: "finish-step" }, { type: "finish" }];
+    case EventType.RUN_ERROR:
+      return [
+        {
+          type: "error",
+          errorText:
+            event.message ??
+            event.messageText ??
+            event.error ??
+            "AG-UI run failed.",
+        },
+      ];
+    default:
+      return [];
+  }
+};
+
+const toolCallChunkToUIMessageChunks = (
+  event: AGUIEvent,
+  toolCalls: Map<string, ToolCallState>
+): UIMessageChunk[] => {
+  const toolCall = getToolCallState(toolCalls, event);
+  const chunks: UIMessageChunk[] = [];
+
+  if (event.toolCallName) {
+    chunks.push({
+      type: "tool-input-start",
+      toolCallId: toolCall.id,
+      toolName: toolCall.name,
+    });
+  }
+
+  if (event.delta) {
+    toolCall.inputText += event.delta;
+    chunks.push({
+      type: "tool-input-delta",
+      toolCallId: toolCall.id,
+      inputTextDelta: event.delta,
+    });
+  }
+
+  return chunks;
+};
+
+const getToolCallState = (
+  toolCalls: Map<string, ToolCallState>,
+  event: AGUIEvent
+) => {
+  const id = event.toolCallId ?? "tool-call";
+  const existing = toolCalls.get(id);
+  if (existing) {
+    if (event.toolCallName) {
+      existing.name = event.toolCallName;
+    }
+
+    return existing;
+  }
+
+  const toolCall = {
+    id,
+    name: event.toolCallName ?? "tool",
+    inputText: "",
+    inputAvailable: false,
+  };
+  toolCalls.set(id, toolCall);
+  return toolCall;
+};
+
+const parseToolInput = (inputText: string) => {
+  if (!inputText.trim()) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(inputText) as unknown;
+  } catch {
+    return inputText;
+  }
+};
 
 const getTextPartId = (
   textPartIds: Map<string, string>,

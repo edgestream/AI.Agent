@@ -11,7 +11,7 @@
     "protocol": "AGUI",
     "endpoint": "http://localhost:8001",
     "label": "News",
-    "description": "Fictional satirical headlines",
+    "description": "News and information agent",
     "icon": "newspaper"
   },
   "weather": {
