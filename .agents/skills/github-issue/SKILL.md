@@ -17,6 +17,19 @@ Repository context:
 - Template issue example: `edgestream/AI.Agent#6`
 - Default human assignee: `marioschmidtgreene`
 
+## Planning Conventions
+
+Use draft project status for concept/planning issues that investigate planned SDK enhancements. Keep the GitHub issue type as `Feature`, but do not prefix titles with `Draft`, `Feature`, or similar metadata. Let the project fields carry planning state.
+
+For draft planned features:
+
+- Title: use the plain feature title, for example `OAuth authentication for SDK agents`.
+- Issue type: `Feature`.
+- Project status: `Draft`.
+- Body: start with a short plain sentence such as `This is a draft feature issue for investigation and SDK direction. Do not implement directly until the SDK integration shape is promoted into concrete task issues.` Do not add a separate `Draft-only planned SDK enhancement` heading.
+- Shape: keep the usual feature sections: `Goal`, `User-facing behavior`, `Architecture and implementation guidance`, `Acceptance criteria`, and `Verification`.
+- Follow-up implementation issues should usually be separate `Task` issues once the draft feature is ready to break down.
+
 ## Required Metadata
 
 Always set these fields when creating feature or task issues:
@@ -46,6 +59,7 @@ Refresh these IDs with GraphQL if a mutation fails or the project schema changes
 - Project field `Priority`: `PVTSSF_lADOA0bEN84BXHPEzhSWZrc`
 - Project field `Size`: `PVTSSF_lADOA0bEN84BXHPEzhSWZrg`
 - Project field `Estimate`: `PVTF_lADOA0bEN84BXHPEzhSWZrk`
+- Status `Draft`: `cabbbc5d`
 - Status `Todo`: `f75ad846`
 - Priority `P0`: `d207b262`
 - Priority `P1`: `f6badfa4`
@@ -73,10 +87,12 @@ gh issue list --repo edgestream/AI.Agent --state open --search "agent chooser"
 
 3. Draft the issue body with the repo feature template shape when appropriate: `Goal`, `User-facing behavior`, `Architecture and implementation guidance`, `Acceptance criteria`, and `Verification`.
 4. Create the issue with GraphQL and include assignee ids, label ids, issue type id, and `projectV2Ids` in the create mutation.
-5. Confirm the issue has a project item. If `createIssue(projectV2Ids: ...)` returns no project item, add it explicitly with `addProjectV2ItemById`.
-6. Set project fields on the project item: `Status=Todo` for new issues, guessed `Priority`, guessed `Size`, and guessed `Estimate`.
+5. Confirm the issue has a project item. Do not rely only on `createIssue(... projectV2Ids ...)` returning `projectItems.nodes[0]`; immediately query the issue's project items and filter for project #6. If no project item exists after the query, add it explicitly with `addProjectV2ItemById`.
+6. Set project fields on the project item: `Status=Draft` for draft planned features, `Status=Todo` for implementation-ready new issues, guessed `Priority`, guessed `Size`, and guessed `Estimate`.
 7. Add dependency relationships with `addBlockedBy`.
 8. Verify the issue metadata, project fields, and relationships with a follow-up GraphQL query.
+
+If a batch create partially succeeds and creates a duplicate, keep the intended issue, close the accidental duplicate with a clear duplicate comment, and clean up obvious title/body metadata on the duplicate if needed. Do not leave duplicate open planning issues.
 
 ## Existing Issue Enrichment
 
@@ -89,7 +105,7 @@ Use this flow when the user asks to backfill or enrich already-created issues:
 gh pr view PR_NUMBER --repo edgestream/AI.Agent --json number,title,additions,deletions,changedFiles,files,commits,mergedAt,url
 ```
 
-3. Keep `Status` as-is for closed issues, usually `Done`. Do not fill `Iteration`, `Start date`, or `Target date`.
+3. Keep `Status` as-is for closed issues, usually `Done`. If a closed duplicate already exists, do not reopen it or move it to `Draft`; only clean metadata the user explicitly asks to clean. Do not fill `Iteration`, `Start date`, or `Target date`.
 4. Set only the missing requested fields unless the user asks for a broader cleanup.
 5. Verify the final project field values with the verification query.
 
@@ -98,6 +114,20 @@ Useful estimating heuristics from past AI.Agent issues:
 - Small package/config/docs integration, around 5 files and under 75 changed lines: usually `Size=S`, `Estimate=3-4`.
 - Cross-cutting repo setup with many new instruction/config files, around 20 files or hundreds of documentation lines: usually `Size=L`, `Estimate=8-16`.
 - Security or local-development hardening touching shared .NET configuration and docs: often `Priority=P1`, `Size=S`, `Estimate=4`.
+
+## Dependency Planning
+
+When asked to investigate blockers across planned features, infer conceptual dependencies from issue bodies and set them as GitHub issue relationships with `addBlockedBy`. Keep the graph acyclic and conservative: add a relationship only when one issue materially needs another issue's architecture, policy, or implementation shape first.
+
+Useful dependency heuristics from AI.Agent planning:
+
+- Identity/authentication foundations usually block auth delegation, MCP authorization, HITL, cloud-managed agents, and business workflows.
+- Conversation history and persistence usually blocks HITL, tracing correlation, and durable business workflows.
+- HITL usually blocks sensitive tool auth, MCP elicitation/approval flows, sandbox execution approvals, and business workflows.
+- Tracing and observability usually blocks sandbox execution audits, cloud-managed agents, and business workflows.
+- Concrete local execution capabilities can block broader sandbox-execution planning, but do not automatically become blocked by all draft platform topics.
+
+Use `Blocked by` from the dependent issue to the prerequisite issue. The reciprocal `Blocking` view is produced by GitHub from the same relationship.
 
 ## GraphQL Commands
 
@@ -147,7 +177,26 @@ gh api graphql \
   -f contentId='ISSUE_ID'
 ```
 
-The `projectV2Ids` argument on `createIssue` is still worth passing, but do not assume it returned a usable `projectItems.nodes[0].id`. Query or add the project item before setting fields.
+The `projectV2Ids` argument on `createIssue` is still worth passing, but do not assume it returned a usable `projectItems.nodes[0].id`. Query the issue after creation and filter by project id before setting fields:
+
+```bash
+gh api graphql \
+  -f query='query($owner:String!, $repo:String!, $number:Int!) {
+    repository(owner:$owner, name:$repo) {
+      issue(number:$number) {
+        id
+        projectItems(first: 20) {
+          nodes { id project { id number title } }
+        }
+      }
+    }
+  }' \
+  -F owner=edgestream \
+  -F repo=AI.Agent \
+  -F number=ISSUE_NUMBER
+```
+
+Only call `addProjectV2ItemById` if that follow-up query does not find project #6. GitHub can successfully add an issue to the project during `createIssue` while the immediate mutation payload does not contain the project item; calling `addProjectV2ItemById` in that case can fail with `Content already exists in this project`.
 
 Set a project single-select field:
 
