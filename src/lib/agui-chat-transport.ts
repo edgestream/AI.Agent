@@ -24,8 +24,10 @@ type SendMessagesOptions = {
 
 type AGUIEvent = {
   type?: string;
+  name?: string;
+  value?: unknown;
   messageId?: string;
-  delta?: string;
+  delta?: unknown;
   message?: string;
   error?: string;
   messageText?: string;
@@ -214,13 +216,15 @@ class AGUIEventToUIMessageChunkStream extends TransformStream<
   constructor() {
     const textPartIds = new Map<string, string>();
     const toolCalls = new Map<string, ToolCallState>();
+    const terminalOutputs = new Map<string, TerminalData>();
 
     super({
       transform(event, controller) {
         for (const chunk of aguiEventToUIMessageChunks(
           event,
           textPartIds,
-          toolCalls
+          toolCalls,
+          terminalOutputs
         )) {
           controller.enqueue(chunk);
         }
@@ -236,10 +240,22 @@ type ToolCallState = {
   inputAvailable: boolean;
 };
 
+type TerminalData = {
+  output: string;
+  isStreaming: boolean;
+  chunks: Array<{
+    output: string;
+    isError: boolean;
+  }>;
+  exitCode?: number;
+  title?: string;
+};
+
 export const aguiEventToUIMessageChunks = (
   event: AGUIEvent,
   textPartIds = new Map<string, string>(),
-  toolCalls = new Map<string, ToolCallState>()
+  toolCalls = new Map<string, ToolCallState>(),
+  terminalOutputs = new Map<string, TerminalData>()
 ): UIMessageChunk[] => {
   switch (event.type) {
     case EventType.RUN_STARTED:
@@ -254,7 +270,7 @@ export const aguiEventToUIMessageChunks = (
         {
           type: "text-delta",
           id: textId,
-          delta: event.delta ?? "",
+          delta: getStringDelta(event),
         },
       ];
     }
@@ -270,7 +286,7 @@ export const aguiEventToUIMessageChunks = (
         {
           type: "text-delta",
           id: textId,
-          delta: event.delta ?? "",
+          delta: getStringDelta(event),
         },
       ];
     }
@@ -286,7 +302,7 @@ export const aguiEventToUIMessageChunks = (
     }
     case EventType.TOOL_CALL_ARGS: {
       const toolCall = getToolCallState(toolCalls, event);
-      const delta = event.delta ?? "";
+      const delta = getStringDelta(event);
       toolCall.inputText += delta;
       return [
         {
@@ -345,10 +361,89 @@ export const aguiEventToUIMessageChunks = (
             "AG-UI run failed.",
         },
       ];
+    case EventType.CUSTOM:
+      return customEventToUIMessageChunks(event, terminalOutputs);
+    case EventType.STATE_DELTA:
+      return stateDeltaEventToUIMessageChunks(event, terminalOutputs);
     default:
       return [];
   }
 };
+
+const stateDeltaEventToUIMessageChunks = (
+  event: AGUIEvent,
+  terminalOutputs: Map<string, TerminalData>
+): UIMessageChunk[] => {
+  const patches = Array.isArray(event.delta) ? event.delta : [];
+  return patches.flatMap((patch) => {
+    const patchRecord = toRecord(patch);
+    if (patchRecord.path !== "/terminalEvents/-") {
+      return [];
+    }
+
+    return terminalValueToUIMessageChunks(patchRecord.value, terminalOutputs);
+  });
+};
+
+const customEventToUIMessageChunks = (
+  event: AGUIEvent,
+  terminalOutputs: Map<string, TerminalData>
+): UIMessageChunk[] => {
+  if (!event.name?.startsWith("terminal.")) {
+    return [];
+  }
+
+  return terminalValueToUIMessageChunks(event.value, terminalOutputs);
+};
+
+const terminalValueToUIMessageChunks = (
+  value: unknown,
+  terminalOutputs: Map<string, TerminalData>
+): UIMessageChunk[] => {
+  const record = toRecord(value);
+  const id = typeof record.id === "string" ? record.id : "terminal";
+  const outputDelta = typeof record.output === "string" ? record.output : "";
+  const isError = record.isError === true;
+  const existing = terminalOutputs.get(id) ?? {
+    output: "",
+    isStreaming: true,
+    chunks: [],
+  };
+
+  const next = {
+    output: existing.output + outputDelta,
+    isStreaming:
+      typeof record.isStreaming === "boolean"
+        ? record.isStreaming
+        : existing.isStreaming,
+    chunks: outputDelta
+      ? [...existing.chunks, { output: outputDelta, isError }]
+      : existing.chunks,
+    exitCode:
+      typeof record.exitCode === "number"
+        ? record.exitCode
+        : existing.exitCode,
+    title: typeof record.title === "string" ? record.title : existing.title,
+  };
+
+  terminalOutputs.set(id, next);
+
+  return [
+    {
+      type: "data-terminal",
+      id,
+      data: next,
+    } as UIMessageChunk,
+  ];
+};
+
+const getStringDelta = (event: AGUIEvent) =>
+  typeof event.delta === "string" ? event.delta : "";
+
+const toRecord = (value: unknown): Record<string, unknown> =>
+  value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
 
 const toolCallChunkToUIMessageChunks = (
   event: AGUIEvent,
@@ -365,12 +460,13 @@ const toolCallChunkToUIMessageChunks = (
     });
   }
 
-  if (event.delta) {
-    toolCall.inputText += event.delta;
+  const delta = getStringDelta(event);
+  if (delta) {
+    toolCall.inputText += delta;
     chunks.push({
       type: "tool-input-delta",
       toolCallId: toolCall.id,
-      inputTextDelta: event.delta,
+      inputTextDelta: delta,
     });
   }
 
