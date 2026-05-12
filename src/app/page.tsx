@@ -5,6 +5,12 @@ import {
   MessageContent,
   MessageResponse,
 } from "@/components/ai-elements/message";
+import {
+  Terminal,
+  TerminalContent,
+  TerminalHeader,
+  TerminalTitle,
+} from "@/components/ai-elements/terminal";
 import { isToolPart, Tool } from "@/components/ai-elements/tool";
 import {
   PromptInput,
@@ -30,6 +36,38 @@ type AgentBootstrapResponse = {
   agents: AgentChooserOption[];
   defaultAgentId: string;
 };
+
+type TerminalPart = {
+  type: "data-terminal";
+  data: {
+    output?: string;
+    chunks?: Array<{
+      output: string;
+      isError?: boolean;
+    }>;
+    exitCode?: number;
+    isStreaming?: boolean;
+    title?: string;
+  };
+};
+
+const isTerminalPart = (part: unknown): part is TerminalPart =>
+  Boolean(
+    part &&
+      typeof part === "object" &&
+      "type" in part &&
+      part.type === "data-terminal" &&
+      "data" in part &&
+      part.data &&
+      typeof part.data === "object"
+  );
+
+const isTerminalToolPart = (
+  part: Parameters<typeof isToolPart>[0]
+): boolean =>
+  isToolPart(part) &&
+  (part.type === "tool-run_terminal" ||
+    (part.type === "dynamic-tool" && part.toolName === "run_terminal"));
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -123,7 +161,28 @@ export default function Home() {
                   }
 
                   if (isToolPart(part)) {
+                    if (isTerminalToolPart(part)) {
+                      return null;
+                    }
+
                     return <Tool key={`${message.id}-${index}`} part={part} />;
+                  }
+
+                  if (isTerminalPart(part)) {
+                    return (
+                      <Terminal
+                        className="my-2 rounded-md"
+                        chunks={part.data.chunks}
+                        isStreaming={part.data.isStreaming}
+                        key={`${message.id}-${index}`}
+                        output={part.data.output ?? ""}
+                      >
+                        <TerminalHeader>
+                          <TerminalTitle>{part.data.title}</TerminalTitle>
+                        </TerminalHeader>
+                        <TerminalContent />
+                      </Terminal>
+                    );
                   }
 
                   return null;
